@@ -12,7 +12,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,15 +26,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSubscribe = (Button) findViewById(R.id.btnSubscribe);
-        mItemSelected = (TextView) findViewById(R.id.tvItemSelected);
+        mSubscribe = findViewById(R.id.btnSubscribe);
+        mItemSelected = findViewById(R.id.tvItemSelected);
 
         listItems = getResources().getStringArray(R.array.subscription_item);
         checkedItems = new boolean[listItems.length];
 
         final LinearLayout.LayoutParams dim = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        //LinearLayout ll = new LinearLayout(MainActivity.this);
-        ScrollView scroll = (ScrollView) findViewById(R.id.offerScrollView);
+        ScrollView scroll = findViewById(R.id.offerScrollView);
         final LinearLayout linearLayout = new LinearLayout(MainActivity.this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         scroll.addView(linearLayout);
@@ -62,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String item = "";
 
-                        //List<TextView> textList = new ArrayList<TextView>(mUserItems.size());
                         linearLayout.removeAllViews();
 
                         for(int k = 0; k < mUserItems.size(); k++){
@@ -71,12 +68,6 @@ public class MainActivity extends AppCompatActivity {
                             if(k != mUserItems.size()-1){
                                 item = item + ", ";
                             }
-
-                            /*
-                            TextView tv1 = new TextView(MainActivity.this);
-                            tv1.setText("This is "+ k);
-
-                            scroll.addView(tv1);*/
                             TextView newTV = new TextView(MainActivity.this);
                             newTV.setLayoutParams(dim);
                             newTV.setTextSize(50);
@@ -84,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
                             newTV.setTextColor(0xFFFF0000);
                             linearLayout.addView(newTV);
                             Log.e("###hello", "test");
-                            //textList.add(newTV);
                         }
 
                         mItemSelected.setText(item);
