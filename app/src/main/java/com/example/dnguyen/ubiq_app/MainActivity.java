@@ -33,22 +33,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
-                mBuilder.setTitle("Items available for subscription");
+                mBuilder.setTitle(R.string.dialog_title);
                 mBuilder.setMultiChoiceItems(listItems, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position, boolean isChecked) {
                         if(isChecked){
-                            if(! mUserItems.contains(position)){
-                                mUserItems.add(position);
-                            } else {
-                                mUserItems.remove(position);
-                            }
+                            mUserItems.add(position);
+                        }else{
+                            mUserItems.remove((Integer.valueOf(position)));
                         }
                     }
                 });
 
                 mBuilder.setCancelable(false);
-                mBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                mBuilder.setPositiveButton(R.string.ok_label, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String item = "";
@@ -63,12 +61,26 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                mBuilder.setNegativeButton("Back", new DialogInterface.OnClickListener() {
+                mBuilder.setNegativeButton(R.string.back_label, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
                     }
                 });
+
+                mBuilder.setNeutralButton(R.string.clear_all_label, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int position) {
+                        for(int i = 0; i < checkedItems.length; i++){
+                            checkedItems[i] = false;
+                            mUserItems.clear();
+                            mItemSelected.setText("");
+                        }
+                    }
+                });
+
+                AlertDialog mDialog = mBuilder.create();
+                mDialog.show();
             }
         });
     }

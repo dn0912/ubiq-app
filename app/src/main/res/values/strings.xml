@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">ubiq_app</string>
     <string name="subscribe_to_products">Subscribe to products</string>
+    <string name="dialog_title">Items available for subscription</string>
+    <string name="ok_label">OK</string>
+    <string name="back_label">Back</string>
+    <string name="clear_all_label">Clear all</string>
 
     <string-array name="subscription_item">
         <item>Test1</item>
