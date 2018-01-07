@@ -4,11 +4,15 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
         listItems = getResources().getStringArray(R.array.subscription_item);
         checkedItems = new boolean[listItems.length];
+
+        final LinearLayout.LayoutParams dim = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        //LinearLayout ll = new LinearLayout(MainActivity.this);
+        ScrollView scroll = (ScrollView) findViewById(R.id.offerScrollView);
+        final LinearLayout linearLayout = new LinearLayout(MainActivity.this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        scroll.addView(linearLayout);
 
         mSubscribe.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,11 +61,30 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String item = "";
-                        for(int k = 0; i < mUserItems.size(); i++){
+
+                        //List<TextView> textList = new ArrayList<TextView>(mUserItems.size());
+                        linearLayout.removeAllViews();
+
+                        for(int k = 0; k < mUserItems.size(); k++){
                             item = item + listItems[mUserItems.get(k)];
+                            // styling string from last item
                             if(k != mUserItems.size()-1){
                                 item = item + ", ";
                             }
+
+                            /*
+                            TextView tv1 = new TextView(MainActivity.this);
+                            tv1.setText("This is "+ k);
+
+                            scroll.addView(tv1);*/
+                            TextView newTV = new TextView(MainActivity.this);
+                            newTV.setLayoutParams(dim);
+                            newTV.setTextSize(50);
+                            newTV.setText("New message. "+listItems[mUserItems.get(k)]);
+                            newTV.setTextColor(0xFFFF0000);
+                            linearLayout.addView(newTV);
+                            Log.e("###hello", "test");
+                            //textList.add(newTV);
                         }
 
                         mItemSelected.setText(item);
