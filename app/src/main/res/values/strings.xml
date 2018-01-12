@@ -5,10 +5,4 @@
     <string name="ok_label">OK</string>
     <string name="back_label">Back</string>
     <string name="clear_all_label">Clear all</string>
-
-    <string-array name="subscription_item">
-        <item>Test1</item>
-        <item>Test2</item>
-        <item>Test3</item>
-    </string-array>
 </resources>

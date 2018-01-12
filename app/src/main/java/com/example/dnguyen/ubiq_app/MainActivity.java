@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     String EXCHANGE_NAME = "supermarkt_duc";
     Set<String> currentSelected = new HashSet<String>();
     Set<String> allItemsSet;
+    HashMap<String, Product> prodMap;
+    ArrayList<String> offerItems;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,8 +49,16 @@ public class MainActivity extends AppCompatActivity {
         mSubscribe = findViewById(R.id.btnSubscribe);
         mItemSelected = findViewById(R.id.tvItemSelected);
 
-        listItems = getResources().getStringArray(R.array.subscription_item);
-        //Collections.addAll(allItemsSet, listItems);
+        offerItems = new ArrayList<>();
+
+        prodMap = new HashMap<>();
+        prodMap.put("Mascara", new Product("Mascara", "4.99 Euro", "Beauty"));
+        prodMap.put("Banana", new Product("Banana", "1.99 Euro/Kg", "Fruits"));
+        prodMap.put("Chicken", new Product("Chicken", "3.99 Euro", "Meat"));
+        prodMap.put("Beer", new Product("Beer", "0.99 Euro", "Alcohol"));
+        prodMap.put("Cola", new Product("Cola", "0.49 Euro", "Soft Drink"));
+
+        listItems = prodMap.keySet().toArray(new String[prodMap.size()]);
         allItemsSet = new HashSet<String>(Arrays.asList(listItems));
         checkedItems = new boolean[listItems.length];
 
@@ -117,13 +130,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Product currentSelectedProd = prodMap.get(offerItems.get(position));
+                Snackbar.make(view, currentSelectedProd.getProduct_type()+" - "+currentSelectedProd.getName()+" current price: "+currentSelectedProd.getPrice(), Snackbar.LENGTH_LONG).setAction("No action", null).show();;
+            }
+        });
+
         @SuppressLint("HandlerLeak") final Handler incomingMsgHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 String message = msg.getData().getString("msg");
-                String listViewString = "New offer for " + ' ' + message;
+                String listViewString = "New offer for " + message;
                 if(!listElementsArrayList.contains(listViewString)){
                     listElementsArrayList.add(listViewString);
+                    offerItems.add(message.split(":")[0]);
                     adapter.notifyDataSetChanged();
                 }
             }
