@@ -148,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
                         for (int i = 0; i < mUserItems.size(); i++) {
                             String productName = listItems[mUserItems.get(i)];
                             channel.queueBind(queueName, EXCHANGE_NAME, "offers." + productName + ".*");
-                            Log.e("queueBind", "offers." + productName + ".*");
                         }
 
                         Consumer consumer = new DefaultConsumer(channel) {
@@ -162,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
                                 bundle.putString("msg", message);
                                 msg.setData(bundle);
                                 handler.sendMessage(msg);
-                                Log.e("handleDelivery", message);
                                 getChannel().basicAck(envelope.getDeliveryTag(), false);
                             }
                         };
