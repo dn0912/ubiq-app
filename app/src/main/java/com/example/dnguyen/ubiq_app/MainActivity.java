@@ -18,7 +18,11 @@ import com.rabbitmq.client.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     boolean[] checkedItems;
     ArrayList<Integer> mUserItems = new ArrayList<>();
     String EXCHANGE_NAME = "supermarkt_duc";
+    Set<String> currentSelected = new HashSet<String>();
+    Set<String> allItemsSet;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         mItemSelected = findViewById(R.id.tvItemSelected);
 
         listItems = getResources().getStringArray(R.array.subscription_item);
+        //Collections.addAll(allItemsSet, listItems);
+        allItemsSet = new HashSet<String>(Arrays.asList(listItems));
         checkedItems = new boolean[listItems.length];
 
         ListView view = (ListView)findViewById(R.id.offerListView);
@@ -69,15 +77,18 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String item = "";
+                        currentSelected.clear();
 
                         for(int k = 0; k < mUserItems.size(); k++){
                             item = item + listItems[mUserItems.get(k)];
+                            currentSelected.add(listItems[mUserItems.get(k)]);
                             // styling string from last item
                             if(k != mUserItems.size()-1){
                                 item = item + ", ";
                             }
                         }
 
+                        allItemsSet.removeAll(currentSelected);
                         mItemSelected.setText(item);
                     }
                 });
@@ -97,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                             mUserItems.clear();
                             mItemSelected.setText("");
                         }
+                        Collections.addAll(allItemsSet, listItems);
                     }
                 });
 
@@ -145,9 +157,12 @@ public class MainActivity extends AppCompatActivity {
                         channel.basicQos(1);
                         channel.exchangeDeclare(EXCHANGE_NAME, "topic", true);
                         String queueName = channel.queueDeclare().getQueue();
-                        for (int i = 0; i < mUserItems.size(); i++) {
-                            String productName = listItems[mUserItems.get(i)];
+                        for (String productName : currentSelected) {
                             channel.queueBind(queueName, EXCHANGE_NAME, "offers." + productName + ".*");
+                        }
+
+                        for (String productName : allItemsSet) {
+                            channel.queueUnbind(queueName, EXCHANGE_NAME, "offers." + productName + ".*");
                         }
 
                         Consumer consumer = new DefaultConsumer(channel) {
