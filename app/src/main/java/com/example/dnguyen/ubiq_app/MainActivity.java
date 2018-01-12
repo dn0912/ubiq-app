@@ -11,17 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.rabbitmq.client.*;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -113,8 +109,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg) {
                 String message = msg.getData().getString("msg");
-                listElementsArrayList.add("New offer for " + ' ' + message);
-                adapter.notifyDataSetChanged();
+                String listViewString = "New offer for " + ' ' + message;
+                if(!listElementsArrayList.contains(listViewString)){
+                    listElementsArrayList.add(listViewString);
+                    adapter.notifyDataSetChanged();
+                }
             }
         };
         subscribe(incomingMsgHandler);
@@ -139,16 +138,17 @@ public class MainActivity extends AppCompatActivity {
         subscribeThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                while (true) {
                     try {
                         Connection conn = factory.newConnection();
                         Channel channel = conn.createChannel();
+                        channel.basicQos(1);
                         channel.exchangeDeclare(EXCHANGE_NAME, "topic", true);
                         String queueName = channel.queueDeclare().getQueue();
-                        for(int i = 0; i < mUserItems.size(); i++) {
+                        for (int i = 0; i < mUserItems.size(); i++) {
                             String productName = listItems[mUserItems.get(i)];
-                            channel.queueBind(queueName, EXCHANGE_NAME, "offers." + productName +".*");
-                            Log.e("queueBind", "offers." + productName +".*");
+                            channel.queueBind(queueName, EXCHANGE_NAME, "offers." + productName + ".*");
+                            Log.e("queueBind", "offers." + productName + ".*");
                         }
 
                         Consumer consumer = new DefaultConsumer(channel) {
@@ -163,14 +163,14 @@ public class MainActivity extends AppCompatActivity {
                                 msg.setData(bundle);
                                 handler.sendMessage(msg);
                                 Log.e("handleDelivery", message);
+                                getChannel().basicAck(envelope.getDeliveryTag(), false);
                             }
                         };
-
                         channel.basicConsume(queueName, true, consumer);
                     } catch (Exception e) {
                         Log.e("subscribe", "Connection is broken:" + e.getClass().getName());
-                        try {
-                            // try to reconnect again
+                        try{
+                            // try to reconnect
                             Thread.sleep(4000);
                         } catch (InterruptedException e1) {
                             break;
